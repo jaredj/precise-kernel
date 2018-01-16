@@ -38,6 +38,7 @@ RUN apt-get update && apt-get install -y \
   dh-autoreconf \
   liblzma-dev \
   python-dev \
+  quilt \
   debian-keyring
 
 # Set the working directory
@@ -46,20 +47,18 @@ WORKDIR /build
 # Build and install trusty build dependencies
 RUN apt-get source -b \
   libiberty-dev \
-  libunwind8-dev \
-&& rm -rf /var/lib/apt/lists/*
+  libunwind8-dev
 RUN dpkg -i \
   libiberty-dev_20131116-1ubuntu0.2_amd64.deb \
   libunwind8_1.1-2.2ubuntu3_amd64.deb \
   libunwind8-dev_1.1-2.2ubuntu3_amd64.deb
 
+# Build dkms package which will play nicer with zfs and spl
+RUN apt-get source -b dkms
+
 # Build kernel package
 RUN apt-get source -b linux-image-3.13.0-139-generic
 
-
-# Copy build packages to volume
-RUN mkdir /packages
-RUN cp *.deb /packages/
 VOLUME /packages
 
 ENTRYPOINT ["/bin/cp", "/build/*.deb", "/packages/"]
