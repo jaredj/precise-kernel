@@ -6,7 +6,7 @@ There are security updates to the 3.13.0 kernel publicly available for use in Tr
 
 ```sh
 docker build -t build-kernel .
-docker run -it -v "${PWD}/output:/packages" build-kernel sh -c "cp /build/*.deb /packages/"
+docker run -it -v "${PWD}/output:/packages" build-kernel
 ```
 
 All debian packages built in the docker container will appear in the `output` directory.
