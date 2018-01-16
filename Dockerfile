@@ -61,5 +61,5 @@ RUN apt-get source -b linux-image-3.13.0-139-generic
 
 VOLUME /packages
 
-ENTRYPOINT ["/bin/cp", "/build/*.deb", "/packages/"]
-
+# Copy build packages to volume
+CMD cp /build/*.deb /packages/
