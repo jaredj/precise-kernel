@@ -37,8 +37,8 @@ RUN dpkg -i \
   libunwind8_1.1-2.2ubuntu3_amd64.deb \
   libunwind8-dev_1.1-2.2ubuntu3_amd64.deb
 
-# None of these are shipped
-RUN rm *.deb
+# None of this is shipped
+RUN rm -rf /build/*
 
 # Install deps and fetch source for DKMS and kernel
 RUN apt-get -y build-dep \
@@ -56,7 +56,13 @@ COPY build_backport.sh /build
 RUN ./build_backport.sh dkms-2.2.0.3
 RUN ./build_backport.sh linux-3.13.0
 
-VOLUME /packages
+# Create ad-hoc repository for easy distribution
+WORKDIR /packages
+RUN mv /build/*.deb /build/*.changes /packages/
+RUN dpkg-scanpackages . | gzip -9c > Packages.gz
+
+
+VOLUME /out
 
 # Copy build packages to volume
-CMD cp /build/*.deb /packages/
+CMD cp /packages/* /out/
