@@ -6,58 +6,55 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-# Copy trusty sources to precise system
-COPY trusty-source-packages.list /etc/apt/sources.list.d/trust-sources.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 16126D3A3E5C1192
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-  vim \
-  debhelper \
-  kernel-wedge \
-  makedumpfile \
-  libelf-dev \
-  libnewt-dev \
-  libdw-dev \
-  libpci-dev \
-  pkg-config \
-  flex \
-  bison \
-  libaudit-dev \
-  bc \
-  xmlto \
-  docbook-utils \
-  transfig \
-  sharutils \
-  asciidoc \
-  build-essential \
-  make \
-  autotools-dev \
-  dh-autoreconf \
-  liblzma-dev \
-  python-dev \
-  quilt \
-  debian-keyring
+# Copy trusty sources to precise system
+COPY trusty-source-packages.list /etc/apt/sources.list.d/trust-sources.list
 
-# Set the working directory
+# Install dependencies and utilities
+RUN apt-get update && apt-get install -y \
+  devscripts \
+  debian-keyring \
+  less \
+  vim 
+
 WORKDIR /build
 
-# Build and install trusty build dependencies
+# Backport build deps that aren't shipped in precise; we must install these
+# before attempting to use apt to install the rest of our build deps
+RUN apt-get -y build-dep \
+  libiberty-dev \
+  libunwind8-dev
+
 RUN apt-get source -b \
   libiberty-dev \
   libunwind8-dev
+
 RUN dpkg -i \
   libiberty-dev_20131116-1ubuntu0.2_amd64.deb \
   libunwind8_1.1-2.2ubuntu3_amd64.deb \
   libunwind8-dev_1.1-2.2ubuntu3_amd64.deb
 
-# Build dkms package which will play nicer with zfs and spl
-RUN apt-get source -b dkms
+# None of these are shipped
+RUN rm *.deb
 
-# Build kernel package
-RUN apt-get source -b linux-image-3.13.0-139-generic
+# Install deps and fetch source for DKMS and kernel
+RUN apt-get -y build-dep \
+  dkms \
+  linux-image-3.13.0-139-generic
+RUN apt-get source \
+  dkms \
+  linux-image-3.13.0-139-generic
+
+# Set name and email that will appear in changelog entries
+ENV NAME Jared Johnson
+ENV EMAIL jjohnson@efolder.net
+
+COPY build_backport.sh /build
+RUN ./build_backport.sh dkms-2.2.0.3
+RUN ./build_backport.sh linux-3.13.0
 
 VOLUME /packages
 
