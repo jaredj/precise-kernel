@@ -1,2 +1,5 @@
 # vim swapfiles
 .*.s??
+# output files
+*.deb
+*.tgz
