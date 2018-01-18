@@ -60,7 +60,7 @@ RUN ./build_backport.sh linux-3.13.0
 
 # Create ad-hoc repository for easy distribution
 WORKDIR /packages
-RUN mv /build/*.deb /build/*.changes /packages/
+RUN mv /build/* /packages/
 RUN dpkg-scanpackages . | gzip -9c > Packages.gz
 
 
