@@ -50,8 +50,14 @@ RUN apt-get source \
   linux-image-3.13.0-139-generic
 
 # Set name and email that will appear in changelog entries
-ENV NAME Jared Johnson
-ENV EMAIL jjohnson@efolder.net
+ARG name="Backport Builder"
+ARG email="nowhere@example.com"
+ARG version="backport"
+ARG distribution="precise"
+ENV NAME=${name}
+ENV EMAIL=${email}
+ENV VERSION=${version}
+ENV DISTRIBUTION=${distribution}
 
 COPY build_backport.sh /build
 RUN ./build_backport.sh dkms-2.2.0.3
