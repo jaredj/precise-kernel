@@ -47,7 +47,7 @@ RUN apt-get -y build-dep \
 RUN apt-get source \
   dkms \
   linux-meta \
-  linux-image-3.13.0-139-generic
+  linux-image-3.13.0-140-generic
 
 # Set name and email that will appear in changelog entries
 ARG name="Backport Builder"
@@ -61,7 +61,7 @@ ENV DISTRIBUTION=${distribution}
 
 COPY build_backport.sh /build
 RUN ./build_backport.sh dkms-2.2.0.3
-RUN ./build_backport.sh linux-meta-3.13.0.139.148
+RUN ./build_backport.sh linux-meta-3.13.0.140.150
 
 # If apt ever tries to upgrade the kernel before upgrading DKMS, it
 # will break things horribly; use Breaks: in debian/control to avoid that

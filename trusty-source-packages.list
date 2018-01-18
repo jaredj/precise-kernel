@@ -40,3 +40,6 @@ deb-src http://security.ubuntu.com/ubuntu trusty-security multiverse
 ## This software is not part of Ubuntu, but is offered by third-party
 ## developers who want to ship their latest software.
 deb-src http://extras.ubuntu.com/ubuntu trusty main
+
+# Trusty-proposed for spectre fix in testing
+deb-src http://archive.ubuntu.com/ubuntu/ trusty-proposed restricted main multiverse universe
