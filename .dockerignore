@@ -1,3 +1,8 @@
+.git
+.gitignore
 *.deb
 *.tgz
-output/*
+*.tar.gz
+output
+Readme.me
+LICENSE
