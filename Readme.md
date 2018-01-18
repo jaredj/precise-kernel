@@ -4,9 +4,32 @@ There are security updates to the 3.13.0 kernel publicly available for use in Tr
 
 # Build instructions
 
+## General
+
 ```sh
 docker build -t build-kernel .
 docker run -it -v "${PWD}/output:/out" build-kernel
 ```
 
-All debian packages built in the docker container will appear in the `output` directory.
+All packages built in the docker container will appear in the `output` directory.
+
+## Replibit-specific example
+
+```sh
+rm output/*
+
+docker build \
+    --build-arg name="Jared Johnson" \
+    --build-arg email="jjohnson@efolder.net" \
+    --build-arg version="efs1204+0" \
+    --build-arg distribution="rb-precise-alpha" \
+    -t \
+    build-kernel \
+    .
+
+docker run -it -v "${PWD}/output:/out" build-kernel
+
+# dput output/*
+# scp output/* user@repository:/upload-location/
+```
+
