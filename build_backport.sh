@@ -2,7 +2,10 @@
 set -e
 set -x
 
-for debian_dir in "${1}/debian" "${1}/debian.master"; do
+package=$1
+shift
+
+for debian_dir in "${package}/debian" "${package}/debian.master"; do
     changelog_file="${debian_dir}/changelog"
     test -f $changelog_file || continue
     echo "Modifying $changelog_file"
@@ -20,5 +23,5 @@ for debian_dir in "${1}/debian" "${1}/debian.master"; do
 
 done
 
-cd $1 && debuild -i -uc -us
-cd .. && rm -rf $1
+cd $package && debuild $@ -i -uc -us
+cd .. && rm -rf $package

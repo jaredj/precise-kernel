@@ -62,7 +62,11 @@ ENV DISTRIBUTION=${distribution}
 COPY build_backport.sh /build
 RUN ./build_backport.sh dkms-2.2.0.3
 RUN ./build_backport.sh linux-meta-3.13.0.139.148
-RUN ./build_backport.sh linux-3.13.0
+# Buid kernel with module and abi checks disabled because they fail
+# with the funky backports version number
+RUN ./build_backport.sh linux-3.13.0 \
+    --set-envvar skipmodule=true \
+    --set-envvar skipabi=true
 
 # Create ad-hoc repository for easy distribution
 WORKDIR /packages
