@@ -27,7 +27,7 @@ docker build \
     build-kernel \
     .
 
-docker run -it -v "${PWD}/output:/out" build-kernel
+docker run --rm -it -v "${PWD}/output:/out" build-kernel
 
 # dput output/*
 # scp output/* user@repository:/upload-location/
