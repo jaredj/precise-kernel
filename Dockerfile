@@ -62,6 +62,15 @@ ENV DISTRIBUTION=${distribution}
 COPY build_backport.sh /build
 RUN ./build_backport.sh dkms-2.2.0.3
 RUN ./build_backport.sh linux-meta-3.13.0.139.148
+
+# If apt ever tries to upgrade the kernel before upgrading DKMS, it
+# will break things horribly; use Breaks: in debian/control to avoid that
+ENV stub_file linux-3.13.0/debian.master/control.d/flavour-control.stub
+RUN awk '/^Package: linux-image-/{print;print "Breaks: dkms (<< 2.2.0.3-1.1ubuntu5.14.04.9~)";next}1' ${stub_file} > ${stub_file}.new
+RUN mv ${stub_file}.new ${stub_file}
+# Some validation
+RUN grep "Breaks: dkms" ${stub_file} >/dev/null 2>&1
+
 # Buid kernel with module and abi checks disabled because they fail
 # with the funky backports version number
 RUN ./build_backport.sh linux-3.13.0 \
