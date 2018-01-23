@@ -4,5 +4,9 @@
 *.tgz
 *.tar.gz
 output
+ccache
+build.sh
+deploy.sh
+Makefile
 Readme.me
 LICENSE
