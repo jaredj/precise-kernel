@@ -42,11 +42,14 @@ RUN rm -rf /build/*
 
 # Install deps and fetch source for DKMS and kernel
 RUN apt-get update && apt-get -y build-dep \
-  dkms \
+  dkms
+RUN apt-get update && apt-get -y build-dep \
   linux-image-3.13.0-141-generic
 RUN apt-get update && apt-get source \
-  dkms \
-  linux-meta \
+  dkms
+RUN apt-get update && apt-get source \
+  linux-meta
+RUN apt-get update && apt-get source \
   linux-image-3.13.0-141-generic
 
 # Set name and email that will appear in changelog entries
@@ -70,20 +73,12 @@ RUN awk '/^Package: linux-image-/{print;print "Breaks: dkms (<< 2.2.0.3-1.1ubunt
 RUN mv ${stub_file}.new ${stub_file}
 # Some validation
 RUN grep "Breaks: dkms" ${stub_file} >/dev/null 2>&1
-
-# Buid kernel with module and abi checks disabled because they fail
-# with the funky backports version number
-RUN ./build_backport.sh linux-3.13.0 \
-    --set-envvar skipmodule=true \
-    --set-envvar skipabi=true
-
-# Create ad-hoc repository for easy distribution
-WORKDIR /packages
-RUN mv /build/* /packages/
-RUN dpkg-scanpackages . | gzip -9c > Packages.gz
-
+COPY build_and_copy.sh /build
+RUN apt-get update && apt-get install -y \
+    ccache
+ENV CCACHE_DIR /ccache
 
 VOLUME /out
 
 # Copy build packages to volume
-CMD cp /packages/* /out/
+CMD ["/build/build_and_copy.sh"]
