@@ -11,7 +11,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 16126D3A3E5C1192
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Copy trusty sources to precise system
-COPY trusty-source-packages.list /etc/apt/sources.list.d/trust-sources.list
+COPY trusty-source-packages.list /etc/apt/sources.list.d/
 
 # Install dependencies and utilities
 RUN apt-get update && apt-get install -y \
