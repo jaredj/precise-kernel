@@ -69,10 +69,12 @@ RUN ./build_backport.sh linux-meta-3.13.0.141.151
 # If apt ever tries to upgrade the kernel before upgrading DKMS, it
 # will break things horribly; use Breaks: in debian/control to avoid that
 ENV stub_file linux-3.13.0/debian.master/control.d/flavour-control.stub
-RUN awk '/^Package: linux-image-/{print;print "Breaks: dkms (<< 2.2.0.3-1.1ubuntu5.14.04.9~)";next}1' ${stub_file} > ${stub_file}.new
+RUN awk '/^Package: linux-image-/{print;print "Breaks: dkms (<< 2.2.0.3-1.1ubuntu5.14.04.9~), e1000e-dkms (<< 3.4.0.2), ixgbe-dkms (<< 5.3.6)";next}1' ${stub_file} > ${stub_file}.new
 RUN mv ${stub_file}.new ${stub_file}
 # Some validation
 RUN grep "Breaks: dkms" ${stub_file} >/dev/null 2>&1
+RUN grep "e1000e-dkms (<<" ${stub_file} >/dev/null 2>&1
+RUN grep "ixgbe-dkms (<<" ${stub_file} >/dev/null 2>&1
 COPY build_and_copy.sh /build
 RUN apt-get update && apt-get install -y \
     ccache
