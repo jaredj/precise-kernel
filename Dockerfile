@@ -15,6 +15,7 @@ COPY trusty-source-packages.list /etc/apt/sources.list.d/
 
 # Install dependencies and utilities
 RUN apt-get update && apt-get install -y \
+  ccache \
   devscripts \
   debian-keyring \
   less \
@@ -72,9 +73,27 @@ RUN mv ${stub_file}.new ${stub_file}
 RUN grep "Breaks: dkms" ${stub_file} >/dev/null 2>&1
 RUN grep "e1000e-dkms (<<" ${stub_file} >/dev/null 2>&1
 RUN grep "ixgbe-dkms (<<" ${stub_file} >/dev/null 2>&1
+
+# Avoid attempting to compile with retpoline since Precise GCC doesn't support it
+ENV config_file linux-3.13.0/debian.master/config/config.common.ubuntu
+RUN sed -i 's/CONFIG_RETPOLINE=y/CONFIG_RETPOLINE=n/' ${config_file}
+
+ENV previous_abi_dir linux-3.13.0/debian.master/abi/3.13.0-143.192
+RUN mkdir -p ${previous_abi_dir}/amd64
+RUN mkdir -p ${previous_abi_dir}/i386
+RUN mkdir -p ${previous_abi_dir}/armhf
+RUN mkdir -p ${previous_abi_dir}/arm64
+RUN mkdir -p ${previous_abi_dir}/powerpc
+RUN mkdir -p ${previous_abi_dir}/ppc64el
+RUN echo "1" > ${previous_abi_dir}/amd64/ignore.retpoline
+RUN echo "1" > ${previous_abi_dir}/i386/ignore.retpoline
+RUN echo "1" > ${previous_abi_dir}/armhf/ignore.retpoline
+RUN echo "1" > ${previous_abi_dir}/arm64/ignore.retpoline
+RUN echo "1" > ${previous_abi_dir}/powerpc/ignore.retpoline
+RUN echo "1" > ${previous_abi_dir}/ppc64el/ignore.retpoline
+
+# Build it
 COPY build_and_copy.sh /build
-RUN apt-get update && apt-get install -y \
-    ccache
 ENV CCACHE_DIR /ccache
 
 VOLUME /out
